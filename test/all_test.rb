@@ -84,4 +84,10 @@ class TestOverride < Test::Unit::TestCase
       assert_equal 3, @foo.qux
     end
   end
+
+  context "chaining successive calls" do
+    should "return the object and allow chained calls" do
+      assert_equal 1, override(@foo, :bar => 1).bar
+    end
+  end
 end

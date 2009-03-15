@@ -1,16 +1,22 @@
 # Override
 #
-# This is the pure esence of the stubbing concept: it takes an object, a
-# method and the desired result, and proceeds to rewrite the method in
-# the object. It can be used as a stubbing strategy in most cases, and
-# I'd say that cases that don't fit this pattern have a very bad smell
+# This is the pure esence of the stubbing concept: it takes an object,
+# a hash of methods/results, and proceeds to rewrite each method in the
+# object. It can be used as a stubbing strategy in most cases, and I'd
+# say that cases that don't fit this pattern have a very bad code smell,
 # because are either dealing with internals or with side effects.
 #
-# Usage:
+# Usage
 #
-#   @user = User.spawn
-#   override(@user, :name => "Foobar", :email => "foobar@example.org")
-#   override(User, :find => @user)
+#     require 'override'
+#
+#     @user = User.spawn
+#     override(@user, :name => "Foobar", :email => "foobar@example.org")
+#     override(User, :find => @user)
+#
+# Or alternatively:
+#
+#     override(User, :find => override(User.spawn, :name => "Foobar, :email => "foobar@example.org"))
 #
 # In case you don't know what spawn means, check my other library for
 # testing at http://github.com/soveran/spawner.
@@ -28,4 +34,5 @@ def override object, methods
       result
     end
   end
+  object
 end

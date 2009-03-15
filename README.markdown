@@ -21,6 +21,10 @@ Usage
     override(@user, :name => "Foobar", :email => "foobar@example.org")
     override(User, :find => @user)
 
+Or alternatively:
+
+    override(User, :find => override(User.spawn, :name => "Foobar, :email => "foobar@example.org"))
+
 In case you don't know what spawn means, check my other library for
 testing at http://github.com/soveran/spawner.
 
