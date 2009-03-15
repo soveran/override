@@ -9,8 +9,8 @@
 # Usage:
 #
 #   @user = User.spawn
-#   override(@user, :name, "Foobar")
-#   override(User, :find, @user)
+#   override(@user, :name => "Foobar", :email => "foobar@example.org")
+#   override(User, :find => @user)
 #
 # In case you don't know what spawn means, check my other library for
 # testing at http://github.com/soveran/spawner.
@@ -22,8 +22,16 @@
 require "rubygems"
 require "metaid"
 
-def override object, method, result
-  object.metaclass.send(:define_method, method) do |*_|
-    result
+# def override object, method, result
+  # object.metaclass.send(:define_method, method) do |*_|
+    # result
+  # end
+# end
+
+def override object, methods
+  methods.each do |method, result|
+    object.metaclass.send(:define_method, method) do |*_|
+      result
+    end
   end
 end
