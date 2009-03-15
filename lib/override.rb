@@ -22,12 +22,6 @@
 require "rubygems"
 require "metaid"
 
-# def override object, method, result
-  # object.metaclass.send(:define_method, method) do |*_|
-    # result
-  # end
-# end
-
 def override object, methods
   methods.each do |method, result|
     object.metaclass.send(:define_method, method) do |*_|
