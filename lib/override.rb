@@ -30,7 +30,7 @@ require "metaid"
 
 def override object, methods
   methods.each do |method, result|
-    object.metaclass.send(:define_method, method) { |*_| result }
+    object.meta_def(method) { |*_| result }
   end
 
   object
