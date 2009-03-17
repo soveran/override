@@ -17,16 +17,58 @@ Usage
 
     require 'override'
 
-    @user = User.spawn
+    user = User.spawn
     override(@user, :name => "Foobar", :email => "foobar@example.org")
-    override(User, :find => @user)
+    override(User, :find => user)
 
 Or alternatively:
 
     override(User, :find => override(User.spawn, :name => "Foobar, :email => "foobar@example.org"))
 
+You can also send lambdas that will become the body of the redefined method:
+
+    user = User.spawn :name => "Foobar"
+    override(User, :find => lambda { |id| raise ArgumentError unless id == 1; user })
+
+And then, in your tests:
+
+    assert_raise ArgumentError do
+      User.find(2)
+    end
+
+    assert_nothing_raised do
+      User.find(1)
+    end
+
+    assert_equal "Foobar", User.find(1).name
+
 In case you don't know what spawn means, check my other library for
 testing at http://github.com/soveran/spawner.
+
+It is a common pattern to set expectations for method calls. You can do
+it with the `expect` function:
+
+    user = User.spawn :name => "Foobar"
+    expect(User, :find, :return => user, :params => [:first, { :include => :friendships }])
+
+And then:
+
+    assert_equal "Foobar", User.find(:first, :include => :friendships).name
+
+This kind of tests encourage a very fine grained development
+style. Testing side effects is possible with this and with many other
+libraries, but it's something that should be avoided as much as
+possible. Always keep in mind that a deterministic function is the
+easiest to test, so the less coupling there is in the system, the more
+reliable it becomes.
+
+Note that this way of setting expectations doesn't count the number
+of calls received by the redefined method. The RSpec equivalent of
+`User.should_receive(:find).with(:first, :include => :friendships)`
+triggers an exception if the method is not called. While it is a handy
+feature, it encourages coupling and testing internals, so my advice
+would be to use it scarcely and to try to refactor your code so it
+doesn't follow this testing anti-pattern.
 
 Installation
 ------------

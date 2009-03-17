@@ -1,6 +1,6 @@
 require 'test/unit'
 require 'rubygems'
-require 'shoulda'
+require 'contest'
 
 require File.dirname(__FILE__) + "/../lib/override"
 
@@ -22,6 +22,14 @@ class Foo
   end
 end
 
+class Callable
+  def to_proc
+    lambda do |name|
+      "Hello #{name}"
+    end
+  end
+end
+
 class TestOverride < Test::Unit::TestCase
   context "dealing with arguments" do
     setup do
@@ -29,11 +37,11 @@ class TestOverride < Test::Unit::TestCase
       override(@foo, :bar => "Hello")
     end
 
-    should "work without arguments" do
+    test "work without arguments" do
       assert_equal "Hello", @foo.bar
     end
 
-    should "discard arguments" do
+    test "discard arguments" do
       assert_equal "Hello", @foo.bar(1)
     end
   end
@@ -44,17 +52,17 @@ class TestOverride < Test::Unit::TestCase
       @foo2 = Foo.new
     end
 
-    should "work for string returns" do
+    test "work for string returns" do
       override(@foo, :bar => "Hello")
       assert_equal "Hello", @foo.bar
     end
 
-    should "work for numeric returns" do
+    test "work for numeric returns" do
       override(@foo, :bar => 23)
       assert_equal 23, @foo.bar
     end
 
-    should "work for object returns" do
+    test "work for object returns" do
       override(@foo, :bar => @foo2)
       assert_equal @foo2, @foo.bar
     end
@@ -65,19 +73,19 @@ class TestOverride < Test::Unit::TestCase
       @foo = Foo.new
     end
 
-    should "work for methods that used to receive blocks" do
+    test "work for methods that used to receive blocks" do
       override(@foo, :baz => "Hey!")
       assert_equal "Hey!", @foo.baz { |x| x }
     end
 
-    should "work for methods that used to receive arguments" do
+    test "work for methods that used to receive arguments" do
       override(@foo, :qux => "Yay!")
       assert_equal "Yay!", @foo.qux(1, 2, 3)
     end
   end
 
   context "rewriting multiple methods at once" do
-    should "override all the passed methods" do
+    test "override all the passed methods" do
       override(@foo, :bar => 1, :baz => 2, :qux => 3)
       assert_equal 1, @foo.bar
       assert_equal 2, @foo.baz
@@ -86,8 +94,107 @@ class TestOverride < Test::Unit::TestCase
   end
 
   context "chaining successive calls" do
-    should "return the object and allow chained calls" do
+    test "return the object and allow chained calls" do
       assert_equal 1, override(@foo, :bar => 1).bar
+    end
+  end
+
+  context "dealing with a proc as the result value" do
+    test "uses the proc as the body of the method" do
+      override(@foo, :bar => lambda { |name| "Hello #{name}" })
+      assert_equal "Hello World", @foo.bar("World")
+    end
+  end
+
+  context "using assert raise with lambdas" do
+    setup do
+      class User
+        def name
+          "Michel"
+        end
+      end
+
+      user = User.new
+      override(@foo, :bar => lambda { |id| raise ArgumentError unless id == 1; user })
+    end
+
+    test "lambdas should be able to raise exceptions" do
+      assert_raise ArgumentError do
+        @foo.bar(2)
+      end
+
+      assert_nothing_raised do
+        @foo.bar(1)
+      end
+
+      assert_equal "Michel", @foo.bar(1).name
+    end
+  end
+
+  context "documenting a gotcha with lambdas" do
+    setup do
+      name = "Michel"
+      @name = "Michel"
+      override(@foo, :bar => lambda { name })
+      override(@foo, :baz => lambda { @name })
+    end
+
+    test "succeeds when the lambda returns a local variable" do
+      assert_equal "Michel", @foo.bar
+    end
+
+    test "fails when the lambda is supposed to return an instance variable" do
+      assert_equal nil, @foo.baz
+    end
+  end
+
+  context "using objects that respond to to_proc" do
+    setup do
+      override(@foo, :bar => Callable.new)
+    end
+
+    test "coerces the value into a proc" do
+      assert_equal "Hello World", @foo.bar("World")
+    end
+  end
+
+  context "supporting procs as return values" do
+    setup do
+      override(@foo, :bar => lambda { lambda { "Hey!" } })
+    end
+
+    test "returns a lambda if it's wraped inside a proc" do
+      assert_equal "Hey!", @foo.bar.call
+    end
+  end
+
+  context "setting expectations" do
+    setup do
+      expect(@foo, :bar, :return => true, :params => ["Michel", 32])
+    end
+
+    test "raises an error if expectations are not met" do
+      assert_raise ArgumentError do
+        @foo.bar "Michel", 31
+      end
+    end
+
+    test "succeeds if expectations are met" do
+      assert_nothing_raised do
+        @foo.bar "Michel", 32
+      end
+    end
+  end
+
+  context "setting expectations with hashes in the param list" do
+    setup do
+      expect(@foo, :bar, :return => true, :params => ["Michel", { :include => :friendships, :select => "name" }])
+    end
+
+    test "succeeds if expectations are met" do
+      assert_nothing_raised do
+        @foo.bar "Michel", { :select => "name", :include => :friendships, :select => "name" }
+      end
     end
   end
 end
