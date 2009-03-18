@@ -17,8 +17,19 @@ class Foo
     "Qux"
   end
 
+  def nom
+    Bar.foo(1, 2, 3)
+    true
+  end
+
   def == other
     bar == other.bar
+  end
+end
+
+class Bar
+  def self.foo(a, b, c)
+    "Bar/Foo"
   end
 end
 
@@ -194,6 +205,24 @@ class TestOverride < Test::Unit::TestCase
     test "succeeds if expectations are met" do
       assert_nothing_raised do
         @foo.bar "Michel", { :select => "name", :include => :friendships, :select => "name" }
+      end
+    end
+  end
+
+  context "side effects" do
+    setup do
+      @foo = Foo.new
+      expect(Bar, :foo, :params => [1, 2, 3], :return => "Bar/Bar")
+    end
+
+    test "don't affect the interface" do
+      assert_equal true, @foo.nom
+    end
+
+    test "detect the method call as a side effect" do
+      override(Bar, :foo => lambda { |*_| raise ArgumentError })
+      assert_raise ArgumentError do
+        @foo.nom
       end
     end
   end
