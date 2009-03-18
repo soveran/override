@@ -48,11 +48,11 @@ class TestOverride < Test::Unit::TestCase
       override(@foo, :bar => "Hello")
     end
 
-    test "work without arguments" do
+    should "work without arguments" do
       assert_equal "Hello", @foo.bar
     end
 
-    test "discard arguments" do
+    should "discard arguments" do
       assert_equal "Hello", @foo.bar(1)
     end
   end
@@ -63,17 +63,17 @@ class TestOverride < Test::Unit::TestCase
       @foo2 = Foo.new
     end
 
-    test "work for string returns" do
+    should "work for string returns" do
       override(@foo, :bar => "Hello")
       assert_equal "Hello", @foo.bar
     end
 
-    test "work for numeric returns" do
+    should "work for numeric returns" do
       override(@foo, :bar => 23)
       assert_equal 23, @foo.bar
     end
 
-    test "work for object returns" do
+    should "work for object returns" do
       override(@foo, :bar => @foo2)
       assert_equal @foo2, @foo.bar
     end
@@ -84,19 +84,19 @@ class TestOverride < Test::Unit::TestCase
       @foo = Foo.new
     end
 
-    test "work for methods that used to receive blocks" do
+    should "work for methods that used to receive blocks" do
       override(@foo, :baz => "Hey!")
       assert_equal "Hey!", @foo.baz { |x| x }
     end
 
-    test "work for methods that used to receive arguments" do
+    should "work for methods that used to receive arguments" do
       override(@foo, :qux => "Yay!")
       assert_equal "Yay!", @foo.qux(1, 2, 3)
     end
   end
 
   context "rewriting multiple methods at once" do
-    test "override all the passed methods" do
+    should "override all the passed methods" do
       override(@foo, :bar => 1, :baz => 2, :qux => 3)
       assert_equal 1, @foo.bar
       assert_equal 2, @foo.baz
@@ -105,13 +105,13 @@ class TestOverride < Test::Unit::TestCase
   end
 
   context "chaining successive calls" do
-    test "return the object and allow chained calls" do
+    should "return the object and allow chained calls" do
       assert_equal 1, override(@foo, :bar => 1).bar
     end
   end
 
   context "dealing with a proc as the result value" do
-    test "uses the proc as the body of the method" do
+    should "uses the proc as the body of the method" do
       override(@foo, :bar => lambda { |name| "Hello #{name}" })
       assert_equal "Hello World", @foo.bar("World")
     end
@@ -129,7 +129,7 @@ class TestOverride < Test::Unit::TestCase
       override(@foo, :bar => lambda { |id| raise ArgumentError unless id == 1; user })
     end
 
-    test "lambdas should be able to raise exceptions" do
+    should "lambdas should be able to raise exceptions" do
       assert_raise ArgumentError do
         @foo.bar(2)
       end
@@ -150,11 +150,11 @@ class TestOverride < Test::Unit::TestCase
       override(@foo, :baz => lambda { @name })
     end
 
-    test "succeeds when the lambda returns a local variable" do
+    should "succeeds when the lambda returns a local variable" do
       assert_equal "Michel", @foo.bar
     end
 
-    test "fails when the lambda is supposed to return an instance variable" do
+    should "fails when the lambda is supposed to return an instance variable" do
       assert_equal nil, @foo.baz
     end
   end
@@ -164,7 +164,7 @@ class TestOverride < Test::Unit::TestCase
       override(@foo, :bar => Callable.new)
     end
 
-    test "coerces the value into a proc" do
+    should "coerces the value into a proc" do
       assert_equal "Hello World", @foo.bar("World")
     end
   end
@@ -174,7 +174,7 @@ class TestOverride < Test::Unit::TestCase
       override(@foo, :bar => lambda { lambda { "Hey!" } })
     end
 
-    test "returns a lambda if it's wraped inside a proc" do
+    should "returns a lambda if it's wraped inside a proc" do
       assert_equal "Hey!", @foo.bar.call
     end
   end
@@ -184,13 +184,13 @@ class TestOverride < Test::Unit::TestCase
       expect(@foo, :bar, :return => true, :params => ["Michel", 32])
     end
 
-    test "raises an error if expectations are not met" do
+    should "raises an error if expectations are not met" do
       assert_raise ArgumentError do
         @foo.bar "Michel", 31
       end
     end
 
-    test "succeeds if expectations are met" do
+    should "succeeds if expectations are met" do
       assert_nothing_raised do
         @foo.bar "Michel", 32
       end
@@ -202,7 +202,7 @@ class TestOverride < Test::Unit::TestCase
       expect(@foo, :bar, :return => true, :params => ["Michel", { :include => :friendships, :select => "name" }])
     end
 
-    test "succeeds if expectations are met" do
+    should "succeeds if expectations are met" do
       assert_nothing_raised do
         @foo.bar "Michel", { :select => "name", :include => :friendships, :select => "name" }
       end
@@ -215,11 +215,21 @@ class TestOverride < Test::Unit::TestCase
       expect(Bar, :foo, :params => [1, 2, 3], :return => "Bar/Bar")
     end
 
-    test "don't affect the interface" do
+    should "don't affect the interface" do
       assert_equal true, @foo.nom
     end
 
-    test "detect the method call as a side effect" do
+    should "detect the method call as a side effect" do
+      override(Bar, :foo => lambda { |*_| raise ArgumentError })
+      assert_raise ArgumentError do
+        @foo.nom
+      end
+    end
+
+    should "don't affect the interfaces!" do
+      @foo = Foo.new
+      expect(Bar, :foo, :params => [1, 2, 3], :return => "Bar/Bar")
+      assert_equal true, @foo.nom
       override(Bar, :foo => lambda { |*_| raise ArgumentError })
       assert_raise ArgumentError do
         @foo.nom
