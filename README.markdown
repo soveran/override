@@ -49,7 +49,7 @@ It is a common pattern to set expectations for method calls. You can do
 it with the `expect` function:
 
     user = User.spawn :name => "Foobar"
-    expect(User, :find, :return => user, :params => [:first, { :include => :friendships }])
+    expect(User, :find, :with => [:first, { :include => :friendships }], :return => user)
 
 And then:
 
@@ -68,7 +68,8 @@ of calls received by the redefined method. The RSpec equivalent of
 triggers an exception if the method is not called. While it is a handy
 feature, it encourages coupling and testing internals, so my advice
 would be to use it scarcely and to try to refactor your code so it
-doesn't follow this testing anti-pattern.
+doesn't follow this testing anti-pattern. Check the tests for more
+examples.
 
 Installation
 ------------

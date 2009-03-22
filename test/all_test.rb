@@ -181,7 +181,7 @@ class TestOverride < Test::Unit::TestCase
 
   context "setting expectations" do
     setup do
-      expect(@foo, :bar, :return => true, :params => ["Michel", 32])
+      expect(@foo, :bar, :with => ["Michel", 32], :return => true)
     end
 
     should "raises an error if expectations are not met" do
@@ -199,7 +199,7 @@ class TestOverride < Test::Unit::TestCase
 
   context "setting expectations with hashes in the param list" do
     setup do
-      expect(@foo, :bar, :return => true, :params => ["Michel", { :include => :friendships, :select => "name" }])
+      expect(@foo, :bar, :with => ["Michel", { :include => :friendships, :select => "name" }], :return => true)
     end
 
     should "succeeds if expectations are met" do
@@ -212,7 +212,7 @@ class TestOverride < Test::Unit::TestCase
   context "side effects" do
     setup do
       @foo = Foo.new
-      expect(Bar, :foo, :params => [1, 2, 3], :return => "Bar/Bar")
+      expect(Bar, :foo, :with => [1, 2, 3], :return => "Bar/Bar")
     end
 
     should "don't affect the interface" do
@@ -228,7 +228,7 @@ class TestOverride < Test::Unit::TestCase
 
     should "don't affect the interfaces!" do
       @foo = Foo.new
-      expect(Bar, :foo, :params => [1, 2, 3], :return => "Bar/Bar")
+      expect(Bar, :foo, :with => [1, 2, 3], :return => "Bar/Bar")
       assert_equal true, @foo.nom
       override(Bar, :foo => lambda { |*_| raise ArgumentError })
       assert_raise ArgumentError do
