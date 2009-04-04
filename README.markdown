@@ -18,7 +18,7 @@ Usage
     require 'override'
 
     user = User.spawn
-    override(@user, :name => "Foobar", :email => "foobar@example.org")
+    override(user, :name => "Foobar", :email => "foobar@example.org")
     override(User, :find => user)
 
 Or alternatively:
