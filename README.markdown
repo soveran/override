@@ -6,7 +6,7 @@ The as-simple-as-possible-but-not-simpler stubbing library.
 Description
 -----------
 
-This is the pure esence of the stubbing concept: it takes an object,
+Override is the essence of the stubbing concept: it takes an object,
 a hash of methods/results, and proceeds to rewrite each method in the
 object. It can be used as a stubbing strategy in most cases, and I'd
 say that cases that don't fit this pattern have a very bad code smell,
@@ -16,6 +16,8 @@ Usage
 -----
 
     require 'override'
+
+    include Override
 
     user = User.spawn
     override(user, :name => "Foobar", :email => "foobar@example.org")
@@ -42,8 +44,7 @@ And then, in your tests:
 
     assert_equal "Foobar", User.find(1).name
 
-In case you don't know what spawn means, check my other library for
-testing at http://github.com/soveran/spawner.
+In case you don't know what spawn means, check my library [Spawner](http://github.com/soveran/spawner).
 
 It is a common pattern to set expectations for method calls. You can do
 it with the `expect` function:

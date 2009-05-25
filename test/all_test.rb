@@ -42,6 +42,8 @@ class Callable
 end
 
 class TestOverride < Test::Unit::TestCase
+  include Override
+
   context "dealing with arguments" do
     setup do
       @foo = Foo.new
