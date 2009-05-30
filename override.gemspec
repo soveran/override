@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = 'override'
-  s.version = '0.0.8'
+  s.version = '0.0.9'
   s.summary = %{The as-simple-as-possible-but-not-simpler stubbing library.}
   s.date = %q{2009-03-13}
   s.author = "Michel Martens"

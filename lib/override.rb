@@ -13,9 +13,17 @@ module Override
 
   def expect object, method, options
     expectation = lambda do |*params|
-      raise ArgumentError unless params == options[:with]
+      unless params == options[:with]
+        raise ExpectationError.new(options[:with], params)
+      end
       options[:return]
     end
     override(object, method => expectation)
+  end
+
+  class ExpectationError < ArgumentError
+    def initialize(expected, actual)
+      super("Expected #{expected.inspect}, got #{actual.inspect}")
+    end
   end
 end

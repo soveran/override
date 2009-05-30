@@ -187,7 +187,7 @@ class TestOverride < Test::Unit::TestCase
     end
 
     should "raises an error if expectations are not met" do
-      assert_raise ArgumentError do
+      assert_raise Override::ExpectationError do
         @foo.bar "Michel", 31
       end
     end
