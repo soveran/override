@@ -44,7 +44,7 @@ And then, in your tests:
 
     assert_equal "Foobar", User.find(1).name
 
-In case you don't know what spawn means, check my library [Spawner](http://github.com/soveran/spawner).
+In case you don't know what spawn means, check my library [Spawn](http://github.com/soveran/spawn).
 
 It is a common pattern to set expectations for method calls. You can do
 it with the `expect` function:
@@ -75,8 +75,7 @@ examples.
 Installation
 ------------
 
-    $ gem sources -a http://gems.github.com (you only have to do this once)
-    $ sudo gem install soveran-override
+    $ sudo gem install override
 
 Thanks
 ------
