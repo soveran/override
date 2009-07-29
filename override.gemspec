@@ -1,19 +1,11 @@
 Gem::Specification.new do |s|
   s.name = 'override'
-  s.version = '0.0.9'
+  s.version = '0.0.10'
   s.summary = %{The as-simple-as-possible-but-not-simpler stubbing library.}
-  s.date = %q{2009-03-13}
+  s.description = "Override is the essence of the stubbing concept: it takes an object, a hash of methods/results, and proceeds to rewrite each method in the object. It can be used as a stubbing strategy in most cases"
   s.author = "Michel Martens"
   s.email = "michel@soveran.com"
   s.homepage = "http://github.com/soveran/override"
-
-  s.specification_version = 2 if s.respond_to? :specification_version=
-
   s.files = ["lib/override.rb", "README.markdown", "LICENSE", "Rakefile", "test/all_test.rb"]
-
-  s.require_paths = ['lib']
-
-  s.add_dependency("metaid", ">= 1.0")
-
-  s.has_rdoc = false
+  s.rubyforge_project = "override"
 end
