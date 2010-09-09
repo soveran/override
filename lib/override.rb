@@ -25,8 +25,8 @@ module Override
   end
 end
 
-# Metaid == a few simple metaclass helper
-# (See http://whytheluckystiff.net/articles/seeingMetaclassesClearly.html.)
+# Metaid == a few simple metaclass helpers
+# (See http://viewsourcecode.org/why/hacking/seeingMetaclassesClearly.html)
 class Object
   # The hidden singleton lurks behind everyone
   def metaclass; class << self; self; end; end
